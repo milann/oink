@@ -32,8 +32,11 @@ module Oink
 
       def log_memory_usage
         if logger
-          memory_usage = get_memory_usage
-          logger.info("Memory usage: #{memory_usage} | PID: #{$$}")
+          @oink_memory_usage = get_memory_usage
+          if self.class.oink_memory_bloat_threshold
+            @is_memory_bloated = (@oink_memory_usage > (self.class.oink_memory_bloat_threshold)) 
+          end
+          logger.info("Memory usage: #{@oink_memory_usage}} | PID: #{$$}")
         end
       end
   end

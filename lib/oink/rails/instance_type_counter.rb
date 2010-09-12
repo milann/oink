@@ -24,11 +24,15 @@ module Oink
 
       def report_instance_type_count
         report_hash = ActiveRecord::Base.instantiated_hash.merge("Total" => ActiveRecord::Base.total_objects_instantiated)
+        if self.class.oink_activerecord_bloat_threshold
+          @is_ar_bloated = (report_hash["Total"] > self.class.oink_activerecord_bloat_threshold)
+        end
         breakdown = report_hash.sort{|a,b| b[1]<=>a[1]}.collect {|k,v| "#{k}: #{v}" }.join(" | ")
         before_report_active_record_count(breakdown)
         if logger
           logger.info("Instantiation Breakdown: #{breakdown}")
         end
+        @oink_instantiation_breakdown = breakdown
         ActiveRecord::Base.reset_instance_type_count
       end
   end
